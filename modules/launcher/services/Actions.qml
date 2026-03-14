@@ -36,6 +36,21 @@ Searcher {
         readonly property list<string> command: modelData.command ?? []
         readonly property bool enabled: modelData.enabled ?? true
         readonly property bool dangerous: modelData.dangerous ?? false
+        readonly property bool needsParam: command.some(arg => arg.includes('%s'))
+
+        function _extractParam(list: AppList): string {
+            const searchText = list.search.text.slice(Config.launcher.actionPrefix.length);
+            const spaceIndex = searchText.indexOf(' ');
+            return spaceIndex !== -1 ? searchText.slice(spaceIndex + 1).trim() : "";
+        }
+
+        // Returns true if it autocompleted (launcher stays open), false if param already present
+        function tryAutocomplete(list: AppList): bool {
+            if (!needsParam || _extractParam(list) !== "")
+                return false;
+            list.search.text = `${Config.launcher.actionPrefix}${name} `;
+            return true;
+        }
 
         function onClicked(list: AppList): void {
             if (command.length === 0)
@@ -46,19 +61,18 @@ Searcher {
             } else if (command[0] === "setMode" && command.length > 1) {
                 list.visibilities.launcher = false;
                 Colours.setMode(command[1]);
-            } else {
+            } else if (needsParam) {
+                if (tryAutocomplete(list))
+                    return;
+                const param = _extractParam(list);
                 list.visibilities.launcher = false;
-                // Extract parameter from search text (text after action name)
-                const searchText = list.search.text.slice(Config.launcher.actionPrefix.length);
-                const spaceIndex = searchText.indexOf(' ');
-                const param = spaceIndex !== -1 ? searchText.slice(spaceIndex + 1).trim() : "";
-
-                // Substitute %s in command with the parameter
                 const processedCommand = command.map(arg =>
                     arg.includes('%s') ? arg.replace(/%s/g, param) : arg
                 );
-
                 Quickshell.execDetached(processedCommand);
+            } else {
+                list.visibilities.launcher = false;
+                Quickshell.execDetached(command);
             }
         }
     }

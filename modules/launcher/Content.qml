@@ -107,6 +107,15 @@ Item {
             Keys.onEscapePressed: root.visibilities.launcher = false
 
             Keys.onPressed: event => {
+                // Tab autocomplete for parameterised actions — works regardless of vimKeybinds
+                if (event.key === Qt.Key_Tab && text.startsWith(Config.launcher.actionPrefix)) {
+                    const currentItem = list.currentList?.currentItem;
+                    if (currentItem?.modelData?.tryAutocomplete?.(list.currentList)) {
+                        event.accepted = true;
+                        return;
+                    }
+                }
+
                 if (!Config.launcher.vimKeybinds)
                     return;
 
