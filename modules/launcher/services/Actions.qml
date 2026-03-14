@@ -45,7 +45,17 @@ Searcher {
                 Colours.setMode(command[1]);
             } else {
                 list.visibilities.launcher = false;
-                Quickshell.execDetached(command);
+                // Extract parameter from search text (text after action name)
+                const searchText = list.search.text.slice(Config.launcher.actionPrefix.length);
+                const spaceIndex = searchText.indexOf(' ');
+                const param = spaceIndex !== -1 ? searchText.slice(spaceIndex + 1).trim() : "";
+
+                // Substitute %s in command with the parameter
+                const processedCommand = command.map(arg =>
+                    arg.includes('%s') ? arg.replace(/%s/g, param) : arg
+                );
+
+                Quickshell.execDetached(processedCommand);
             }
         }
     }
