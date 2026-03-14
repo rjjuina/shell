@@ -11,7 +11,10 @@ Searcher {
     id: root
 
     function transformSearch(search: string): string {
-        return search.slice(Config.launcher.actionPrefix.length);
+        const actionText = search.slice(Config.launcher.actionPrefix.length);
+        // Only match the first word (action name), ignore parameters after space
+        const spaceIndex = actionText.indexOf(' ');
+        return spaceIndex !== -1 ? actionText.slice(0, spaceIndex) : actionText;
     }
 
     list: variants.instances
