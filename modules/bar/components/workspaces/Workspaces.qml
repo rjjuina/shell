@@ -13,6 +13,7 @@ StyledClippingRect {
 
     required property ShellScreen screen
 
+    readonly property bool isTop: Config.bar.position === "top"
     readonly property bool onSpecial: (Config.bar.workspaces.perMonitorWorkspaces ? Hypr.monitorFor(screen) : Hypr.focusedMonitor)?.lastIpcObject?.specialWorkspace?.name !== ""
     readonly property int activeWsId: Config.bar.workspaces.perMonitorWorkspaces ? (Hypr.monitorFor(screen).activeWorkspace?.id ?? 1) : Hypr.activeWsId
 
@@ -26,8 +27,8 @@ StyledClippingRect {
 
     property real blur: onSpecial ? 1 : 0
 
-    implicitWidth: Config.bar.sizes.innerWidth
-    implicitHeight: layout.implicitHeight + Appearance.padding.small * 2
+    implicitWidth: isTop ? layout.implicitWidth + Appearance.padding.small * 2 : Config.bar.sizes.innerWidth
+    implicitHeight: isTop ? Config.bar.sizes.innerHeight : layout.implicitHeight + Appearance.padding.small * 2
 
     color: Colours.tPalette.m3surfaceContainer
     radius: Appearance.rounding.full
@@ -57,10 +58,13 @@ StyledClippingRect {
             }
         }
 
-        ColumnLayout {
+        GridLayout {
             id: layout
 
             anchors.centerIn: parent
+            columns: root.isTop ? -1 : 1
+            rows: root.isTop ? 1 : -1
+            flow: root.isTop ? GridLayout.LeftToRight : GridLayout.TopToBottom
             spacing: Math.floor(Appearance.spacing.small / 2)
 
             Repeater {
@@ -77,7 +81,8 @@ StyledClippingRect {
         }
 
         Loader {
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenter: root.isTop ? undefined : parent.horizontalCenter
+            anchors.verticalCenter: root.isTop ? parent.verticalCenter : undefined
             active: Config.bar.workspaces.activeIndicator
 
             sourceComponent: ActiveIndicator {

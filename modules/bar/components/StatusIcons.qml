@@ -15,22 +15,32 @@ StyledRect {
 
     property color colour: Colours.palette.m3secondary
     readonly property alias items: iconColumn
+    readonly property bool isTop: Config.bar.position === "top"
 
     color: Colours.tPalette.m3surfaceContainer
     radius: Appearance.rounding.full
 
     clip: true
-    implicitWidth: Config.bar.sizes.innerWidth
-    implicitHeight: iconColumn.implicitHeight + Appearance.padding.normal * 2 - (Config.bar.status.showLockStatus && !Hypr.capsLock && !Hypr.numLock ? iconColumn.spacing : 0)
+    implicitWidth: isTop
+        ? iconColumn.implicitWidth + Appearance.padding.normal * 2
+        : Config.bar.sizes.innerWidth
+    implicitHeight: isTop
+        ? Config.bar.sizes.innerHeight
+        : iconColumn.implicitHeight + Appearance.padding.normal * 2 - (Config.bar.status.showLockStatus && !Hypr.capsLock && !Hypr.numLock ? iconColumn.spacing : 0)
 
-    ColumnLayout {
+    GridLayout {
         id: iconColumn
 
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.left: isTop ? undefined : parent.left
+        anchors.right: isTop ? parent.right : parent.right
+        anchors.top: isTop ? parent.top : undefined
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: Appearance.padding.normal
+        anchors.bottomMargin: isTop ? 0 : Appearance.padding.normal
+        anchors.rightMargin: isTop ? Appearance.padding.normal : 0
 
+        columns: isTop ? -1 : 1
+        rows: isTop ? 1 : -1
+        flow: isTop ? GridLayout.LeftToRight : GridLayout.TopToBottom
         spacing: Appearance.spacing.smaller / 2
 
         // Lock keys status
@@ -264,7 +274,7 @@ StyledRect {
     component WrappedLoader: Loader {
         required property string name
 
-        Layout.alignment: Qt.AlignHCenter
+        Layout.alignment: root.isTop ? Qt.AlignVCenter : Qt.AlignHCenter
         visible: active
     }
 }
