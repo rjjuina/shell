@@ -1,6 +1,7 @@
 import Quickshell.Io
 
 JsonObject {
+    property string position: "left" // "left" or "top"
     property bool persistent: true
     property bool showOnHover: true
     property int dragThreshold: 20
@@ -101,6 +102,7 @@ JsonObject {
         property bool showBluetooth: true
         property bool showBattery: true
         property bool showLockStatus: true
+        property bool showBtcPrice: false
     }
 
     component Clock: JsonObject {
@@ -114,5 +116,6 @@ JsonObject {
         property int batteryWidth: 250
         property int networkWidth: 320
         property int kbLayoutWidth: 320
+        property int innerHeight: 40
     }
 }
