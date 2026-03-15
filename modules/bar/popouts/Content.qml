@@ -169,8 +169,10 @@ Item {
         required property string name
         readonly property bool shouldBeActive: root.wrapper.currentName === name
 
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.right: parent.right
+        anchors.verticalCenter: Config.bar.position === "top" ? undefined : parent.verticalCenter
+        anchors.right: Config.bar.position === "top" ? undefined : parent.right
+        anchors.top: Config.bar.position === "top" ? parent.top : undefined
+        anchors.horizontalCenter: Config.bar.position === "top" ? parent.horizontalCenter : undefined
 
         opacity: 0
         scale: 0.8
