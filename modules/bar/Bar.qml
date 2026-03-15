@@ -153,6 +153,12 @@ ColumnLayout {
                 }
             }
             DelegateChoice {
+                roleValue: "btcPrice"
+                delegate: WrappedLoader {
+                    sourceComponent: BtcPrice {}
+                }
+            }
+            DelegateChoice {
                 roleValue: "statusIcons"
                 delegate: WrappedLoader {
                     sourceComponent: StatusIcons {}
