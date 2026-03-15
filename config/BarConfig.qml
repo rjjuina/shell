@@ -30,7 +30,7 @@ JsonObject {
         },
         {
             id: "activeWindow",
-            enabled: true
+            enabled: false
         },
         {
             id: "spacer",
