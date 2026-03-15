@@ -109,9 +109,12 @@ GridLayout {
                 MaterialIcon {
                     required property var modelData
 
+                    readonly property real iconSize: (root.isTop ? Config.bar.sizes.innerHeight : Config.bar.sizes.innerWidth) / 3
+
                     grade: 0
                     text: Icons.getAppCategoryIcon(modelData.lastIpcObject.class, "terminal")
                     color: Colours.palette.m3onSurfaceVariant
+                    font.pixelSize: iconSize
                 }
             }
         }
