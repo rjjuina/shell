@@ -166,9 +166,9 @@ Variants {
                     id: bar
 
                     anchors.top: parent.top
-                    anchors.bottom: scope.isTop ? undefined : parent.bottom
-                    anchors.left: scope.isTop ? parent.left : undefined
-                    anchors.right: scope.isTop ? parent.right : undefined
+                    anchors.left: parent.left
+                    width: scope.isTop ? parent.width : implicitWidth
+                    height: scope.isTop ? implicitHeight : parent.height
 
                     screen: scope.modelData
                     visibilities: visibilities
