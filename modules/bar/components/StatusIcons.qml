@@ -26,7 +26,7 @@ StyledRect {
         : Config.bar.sizes.innerWidth
     implicitHeight: isTop
         ? Config.bar.sizes.innerHeight
-        : iconColumn.implicitHeight + Appearance.padding.normal * 2 - (Config.bar.status.showLockStatus && !Hypr.capsLock && !Hypr.numLock ? iconColumn.spacing : 0)
+        : iconColumn.implicitHeight + Appearance.padding.normal * 2 - (Config.bar.status.showLockStatus && !Hypr.capsLock && !Hypr.numLock ? iconColumn.rowSpacing : 0)
 
     GridLayout {
         id: iconColumn
@@ -41,7 +41,8 @@ StyledRect {
         columns: isTop ? -1 : 1
         rows: isTop ? 1 : -1
         flow: isTop ? GridLayout.LeftToRight : GridLayout.TopToBottom
-        spacing: Appearance.spacing.smaller / 2
+        columnSpacing: Appearance.spacing.smaller / 2
+        rowSpacing: Appearance.spacing.smaller / 2
 
         // Lock keys status
         WrappedLoader {
@@ -81,7 +82,7 @@ StyledRect {
                 }
 
                 Item {
-                    Layout.topMargin: Hypr.capsLock && Hypr.numLock ? iconColumn.spacing : 0
+                    Layout.topMargin: Hypr.capsLock && Hypr.numLock ? iconColumn.rowSpacing : 0
 
                     implicitWidth: numlockIcon.implicitWidth
                     implicitHeight: Hypr.numLock ? numlockIcon.implicitHeight : 0

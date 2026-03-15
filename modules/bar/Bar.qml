@@ -17,6 +17,7 @@ GridLayout {
     required property BarPopouts.Wrapper popouts
     readonly property int vPadding: Appearance.padding.large
     readonly property bool isTop: Config.bar.position === "top"
+    readonly property int spacing: Appearance.spacing.normal
 
     columns: isTop ? -1 : 1
     rows: isTop ? 1 : -1
@@ -118,7 +119,8 @@ GridLayout {
         }
     }
 
-    spacing: Appearance.spacing.normal
+    columnSpacing: Appearance.spacing.normal
+    rowSpacing: Appearance.spacing.normal
 
     Repeater {
         id: repeater

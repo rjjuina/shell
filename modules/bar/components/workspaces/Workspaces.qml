@@ -65,7 +65,8 @@ StyledClippingRect {
             columns: root.isTop ? -1 : 1
             rows: root.isTop ? 1 : -1
             flow: root.isTop ? GridLayout.LeftToRight : GridLayout.TopToBottom
-            spacing: Math.floor(Appearance.spacing.small / 2)
+            columnSpacing: Math.floor(Appearance.spacing.small / 2)
+            rowSpacing: Math.floor(Appearance.spacing.small / 2)
 
             Repeater {
                 id: workspaces
