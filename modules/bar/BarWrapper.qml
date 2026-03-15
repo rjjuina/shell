@@ -14,9 +14,17 @@ Item {
     required property BarPopouts.Wrapper popouts
     required property bool disabled
 
+    readonly property bool isTop: Config.bar.position === "top"
     readonly property int padding: Math.max(Appearance.padding.smaller, Config.border.thickness)
-    readonly property int contentWidth: Config.bar.sizes.innerWidth + padding * 2
-    readonly property int exclusiveZone: !disabled && (Config.bar.persistent || visibilities.bar) ? contentWidth : Config.border.thickness
+    readonly property int contentWidth: isTop ? 0 : Config.bar.sizes.innerWidth + padding * 2
+    readonly property int contentHeight: isTop ? Config.bar.sizes.innerHeight + padding * 2 : 0
+    readonly property int exclusiveZone: {
+        if (disabled)
+            return Config.border.thickness;
+        if (isTop)
+            return (Config.bar.persistent || visibilities.bar) ? contentHeight : Config.border.thickness;
+        return (Config.bar.persistent || visibilities.bar) ? contentWidth : Config.border.thickness;
+    }
     readonly property bool shouldBeVisible: !disabled && (Config.bar.persistent || visibilities.bar || isHovered)
     property bool isHovered
 
@@ -24,23 +32,25 @@ Item {
         content.item?.closeTray();
     }
 
-    function checkPopout(y: real): void {
-        content.item?.checkPopout(y);
+    function checkPopout(pos: real): void {
+        content.item?.checkPopout(pos);
     }
 
-    function handleWheel(y: real, angleDelta: point): void {
-        content.item?.handleWheel(y, angleDelta);
+    function handleWheel(pos: real, angleDelta: point): void {
+        content.item?.handleWheel(pos, angleDelta);
     }
 
-    visible: width > Config.border.thickness
-    implicitWidth: Config.border.thickness
+    visible: isTop ? height > Config.border.thickness : width > Config.border.thickness
+    implicitWidth: isTop ? 0 : Config.border.thickness
+    implicitHeight: isTop ? Config.border.thickness : 0
 
     states: State {
         name: "visible"
         when: root.shouldBeVisible
 
         PropertyChanges {
-            root.implicitWidth: root.contentWidth
+            root.implicitWidth: root.isTop ? root.implicitWidth : root.contentWidth
+            root.implicitHeight: root.isTop ? root.contentHeight : root.implicitHeight
         }
     }
 
@@ -51,7 +61,7 @@ Item {
 
             Anim {
                 target: root
-                property: "implicitWidth"
+                property: root.isTop ? "implicitHeight" : "implicitWidth"
                 duration: Appearance.anim.durations.expressiveDefaultSpatial
                 easing.bezierCurve: Appearance.anim.curves.expressiveDefaultSpatial
             }
@@ -62,7 +72,7 @@ Item {
 
             Anim {
                 target: root
-                property: "implicitWidth"
+                property: root.isTop ? "implicitHeight" : "implicitWidth"
                 easing.bezierCurve: Appearance.anim.curves.emphasized
             }
         }
@@ -72,13 +82,15 @@ Item {
         id: content
 
         anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
+        anchors.bottom: isTop ? parent.bottom : parent.bottom
+        anchors.left: isTop ? parent.left : undefined
+        anchors.right: isTop ? parent.right : parent.right
 
         active: root.shouldBeVisible || root.visible
 
         sourceComponent: Bar {
-            width: root.contentWidth
+            width: isTop ? parent.width : root.contentWidth
+            height: isTop ? root.contentHeight : undefined
             screen: root.screen
             visibilities: root.visibilities
             popouts: root.popouts

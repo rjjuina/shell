@@ -9,13 +9,18 @@ import Quickshell
 import QtQuick
 import QtQuick.Layouts
 
-ColumnLayout {
+GridLayout {
     id: root
 
     required property ShellScreen screen
     required property PersistentProperties visibilities
     required property BarPopouts.Wrapper popouts
     readonly property int vPadding: Appearance.padding.large
+    readonly property bool isTop: Config.bar.position === "top"
+
+    columns: isTop ? -1 : 1
+    rows: isTop ? 1 : -1
+    flow: isTop ? GridLayout.LeftToRight : GridLayout.TopToBottom
 
     function closeTray(): void {
         if (!Config.bar.tray.compact)
@@ -29,8 +34,10 @@ ColumnLayout {
         }
     }
 
-    function checkPopout(y: real): void {
-        const ch = childAt(width / 2, y) as WrappedLoader;
+    function checkPopout(pos: real): void {
+        const ch = isTop
+            ? (childAt(pos, height / 2) as WrappedLoader)
+            : (childAt(width / 2, pos) as WrappedLoader);
 
         if (ch?.id !== "tray")
             closeTray();
@@ -41,25 +48,31 @@ ColumnLayout {
         }
 
         const id = ch.id;
-        const top = ch.y;
+        const top = isTop ? ch.x : ch.y;
         const item = ch.item;
         const itemHeight = item.implicitHeight;
 
         if (id === "statusIcons" && Config.bar.popouts.statusIcons) {
             const items = item.items;
-            const icon = items.childAt(items.width / 2, mapToItem(items, 0, y).y);
+            const icon = isTop
+                ? items.childAt(mapToItem(items, pos, 0).x, items.height / 2)
+                : items.childAt(items.width / 2, mapToItem(items, 0, pos).y);
             if (icon) {
                 popouts.currentName = icon.name;
-                popouts.currentCenter = Qt.binding(() => icon.mapToItem(root, 0, icon.implicitHeight / 2).y);
+                popouts.currentCenter = isTop
+                    ? Qt.binding(() => icon.mapToItem(root, icon.implicitWidth / 2, 0).x)
+                    : Qt.binding(() => icon.mapToItem(root, 0, icon.implicitHeight / 2).y);
                 popouts.hasCurrent = true;
             }
         } else if (id === "tray" && Config.bar.popouts.tray) {
-            if (!Config.bar.tray.compact || (item.expanded && !item.expandIcon.contains(mapToItem(item.expandIcon, item.implicitWidth / 2, y)))) {
-                const index = Math.floor(((y - top - item.padding * 2 + item.spacing) / item.layout.implicitHeight) * item.items.count);
+            if (!Config.bar.tray.compact || (item.expanded && !item.expandIcon.contains(mapToItem(item.expandIcon, item.implicitWidth / 2, pos)))) {
+                const index = Math.floor(((pos - top - item.padding * 2 + item.spacing) / item.layout.implicitHeight) * item.items.count);
                 const trayItem = item.items.itemAt(index);
                 if (trayItem) {
                     popouts.currentName = `traymenu${index}`;
-                    popouts.currentCenter = Qt.binding(() => trayItem.mapToItem(root, 0, trayItem.implicitHeight / 2).y);
+                    popouts.currentCenter = isTop
+                        ? Qt.binding(() => trayItem.mapToItem(root, trayItem.implicitWidth / 2, 0).x)
+                        : Qt.binding(() => trayItem.mapToItem(root, 0, trayItem.implicitHeight / 2).y);
                     popouts.hasCurrent = true;
                 } else {
                     popouts.hasCurrent = false;
@@ -70,13 +83,17 @@ ColumnLayout {
             }
         } else if (id === "activeWindow" && Config.bar.popouts.activeWindow) {
             popouts.currentName = id.toLowerCase();
-            popouts.currentCenter = item.mapToItem(root, 0, itemHeight / 2).y;
+            popouts.currentCenter = isTop
+                ? item.mapToItem(root, item.implicitWidth / 2, 0).x
+                : item.mapToItem(root, 0, itemHeight / 2).y;
             popouts.hasCurrent = true;
         }
     }
 
-    function handleWheel(y: real, angleDelta: point): void {
-        const ch = childAt(width / 2, y) as WrappedLoader;
+    function handleWheel(pos: real, angleDelta: point): void {
+        const ch = isTop
+            ? (childAt(pos, height / 2) as WrappedLoader)
+            : (childAt(width / 2, pos) as WrappedLoader);
         if (ch?.id === "workspaces" && Config.bar.scrollActions.workspaces) {
             // Workspace scroll
             const mon = (Config.bar.workspaces.perMonitorWorkspaces ? Hypr.monitorFor(screen) : Hypr.focusedMonitor);
@@ -85,7 +102,7 @@ ColumnLayout {
                 Hypr.dispatch(`togglespecialworkspace ${specialWs.slice(8)}`);
             else if (angleDelta.y < 0 || (Config.bar.workspaces.perMonitorWorkspaces ? mon.activeWorkspace?.id : Hypr.activeWsId) > 1)
                 Hypr.dispatch(`workspace r${angleDelta.y > 0 ? "-" : "+"}1`);
-        } else if (y < screen.height / 2 && Config.bar.scrollActions.volume) {
+        } else if ((isTop ? pos < screen.width / 2 : pos < screen.height / 2) && Config.bar.scrollActions.volume) {
             // Volume scroll on top half
             if (angleDelta.y > 0)
                 Audio.incrementVolume();
@@ -114,7 +131,8 @@ ColumnLayout {
             DelegateChoice {
                 roleValue: "spacer"
                 delegate: WrappedLoader {
-                    Layout.fillHeight: enabled
+                    Layout.fillHeight: enabled && !root.isTop
+                    Layout.fillWidth: enabled && root.isTop
                 }
             }
             DelegateChoice {
@@ -199,11 +217,13 @@ ColumnLayout {
             return null;
         }
 
-        Layout.alignment: Qt.AlignHCenter
+        Layout.alignment: root.isTop ? Qt.AlignVCenter : Qt.AlignHCenter
 
         // Cursed ahh thing to add padding to first and last enabled components
-        Layout.topMargin: findFirstEnabled() === this ? root.vPadding : 0
-        Layout.bottomMargin: findLastEnabled() === this ? root.vPadding : 0
+        Layout.topMargin: !root.isTop && findFirstEnabled() === this ? root.vPadding : 0
+        Layout.bottomMargin: !root.isTop && findLastEnabled() === this ? root.vPadding : 0
+        Layout.leftMargin: root.isTop && findFirstEnabled() === this ? root.vPadding : 0
+        Layout.rightMargin: root.isTop && findLastEnabled() === this ? root.vPadding : 0
 
         visible: enabled
         active: enabled
