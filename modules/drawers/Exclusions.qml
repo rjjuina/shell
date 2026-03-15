@@ -12,7 +12,8 @@ Scope {
     required property Item bar
 
     ExclusionZone {
-        anchors.left: true
+        anchors.left: Config.bar.position !== "top"
+        anchors.top: Config.bar.position === "top"
         exclusiveZone: root.bar.exclusiveZone
     }
 

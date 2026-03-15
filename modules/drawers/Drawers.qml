@@ -20,6 +20,7 @@ Variants {
 
         required property ShellScreen modelData
         readonly property bool barDisabled: Strings.testRegexList(Config.bar.excludedScreens, modelData.name)
+        readonly property bool isTop: Config.bar.position === "top"
 
         Exclusions {
             screen: scope.modelData
@@ -57,10 +58,10 @@ Variants {
             WlrLayershell.keyboardFocus: visibilities.launcher || visibilities.session ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
             mask: Region {
-                x: bar.implicitWidth + win.dragMaskPadding
-                y: Config.border.thickness + win.dragMaskPadding
-                width: win.width - bar.implicitWidth - Config.border.thickness - win.dragMaskPadding * 2
-                height: win.height - Config.border.thickness * 2 - win.dragMaskPadding * 2
+                x: (scope.isTop ? 0 : bar.implicitWidth) + win.dragMaskPadding
+                y: (scope.isTop ? bar.implicitHeight : Config.border.thickness) + win.dragMaskPadding
+                width: win.width - (scope.isTop ? 0 : bar.implicitWidth) - Config.border.thickness - win.dragMaskPadding * 2
+                height: win.height - (scope.isTop ? bar.implicitHeight : 0) - Config.border.thickness * 2 - win.dragMaskPadding * 2
                 intersection: Intersection.Xor
 
                 regions: regions.instances
@@ -79,8 +80,8 @@ Variants {
                 Region {
                     required property Item modelData
 
-                    x: modelData.x + bar.implicitWidth
-                    y: modelData.y + Config.border.thickness
+                    x: modelData.x + (scope.isTop ? 0 : bar.implicitWidth)
+                    y: modelData.y + (scope.isTop ? bar.implicitHeight : Config.border.thickness)
                     width: modelData.width
                     height: modelData.height
                     intersection: Intersection.Subtract
@@ -165,7 +166,9 @@ Variants {
                     id: bar
 
                     anchors.top: parent.top
-                    anchors.bottom: parent.bottom
+                    anchors.bottom: scope.isTop ? undefined : parent.bottom
+                    anchors.left: scope.isTop ? parent.left : undefined
+                    anchors.right: scope.isTop ? parent.right : undefined
 
                     screen: scope.modelData
                     visibilities: visibilities
