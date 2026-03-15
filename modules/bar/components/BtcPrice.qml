@@ -44,10 +44,7 @@ Grid {
                 try {
                     const json = JSON.parse(text);
                     const usd = json.bitcoin.usd;
-                    if (usd >= 1000)
-                        root.price = Math.round(usd / 1000) + "k";
-                    else
-                        root.price = "$" + Math.round(usd);
+                    root.price = "$" + Math.round(usd).toLocaleString();
                 } catch (e) {
                     root.price = "N/A";
                 }

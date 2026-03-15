@@ -13,6 +13,7 @@ StyledRect {
     readonly property alias layout: layout
     readonly property alias items: items
     readonly property alias expandIcon: expandIcon
+    readonly property bool isTop: Config.bar.position === "top"
 
     readonly property int padding: Config.bar.tray.background ? Appearance.padding.normal : Appearance.padding.small
     readonly property int spacing: Config.bar.tray.background ? Appearance.spacing.small : 0
@@ -25,21 +26,34 @@ StyledRect {
         return (expanded ? expandIcon.implicitHeight + layout.implicitHeight + spacing : expandIcon.implicitHeight) + padding * 2;
     }
 
-    clip: true
-    visible: height > 0
+    readonly property real nonAnimWidth: {
+        if (!Config.bar.tray.compact)
+            return layout.implicitWidth + padding * 2;
+        return (expanded ? expandIcon.implicitWidth + layout.implicitWidth + spacing : expandIcon.implicitWidth) + padding * 2;
+    }
 
-    implicitWidth: Config.bar.sizes.innerWidth
-    implicitHeight: nonAnimHeight
+    clip: true
+    visible: isTop ? width > 0 : height > 0
+
+    implicitWidth: isTop ? nonAnimWidth : Config.bar.sizes.innerWidth
+    implicitHeight: isTop ? Config.bar.sizes.innerHeight : nonAnimHeight
 
     color: Qt.alpha(Colours.tPalette.m3surfaceContainer, (Config.bar.tray.background && items.count > 0) ? Colours.tPalette.m3surfaceContainer.a : 0)
     radius: Appearance.rounding.full
 
-    Column {
+    Grid {
         id: layout
 
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: root.padding
+        anchors.horizontalCenter: isTop ? undefined : parent.horizontalCenter
+        anchors.verticalCenter: isTop ? parent.verticalCenter : undefined
+        anchors.top: isTop ? undefined : parent.top
+        anchors.left: isTop ? parent.left : undefined
+        anchors.topMargin: isTop ? 0 : root.padding
+        anchors.leftMargin: isTop ? root.padding : 0
+
+        columns: isTop ? -1 : 1
+        rows: isTop ? 1 : -1
+        flow: isTop ? Grid.LeftToRight : Grid.TopToBottom
         spacing: Appearance.spacing.small
 
         opacity: root.expanded || !Config.bar.tray.compact ? 1 : 0
@@ -82,30 +96,31 @@ StyledRect {
     Loader {
         id: expandIcon
 
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: isTop ? undefined : parent.horizontalCenter
+        anchors.verticalCenter: isTop ? parent.verticalCenter : undefined
+        anchors.bottom: isTop ? undefined : parent.bottom
+        anchors.right: isTop ? parent.right : undefined
 
         active: Config.bar.tray.compact && items.count > 0
 
         sourceComponent: Item {
-            implicitWidth: expandIconInner.implicitWidth
-            implicitHeight: expandIconInner.implicitHeight - Appearance.padding.small * 2
+            implicitWidth: expandIconInner.implicitWidth - (isTop ? Appearance.padding.small * 2 : 0)
+            implicitHeight: expandIconInner.implicitHeight - (isTop ? 0 : Appearance.padding.small * 2)
 
             MaterialIcon {
                 id: expandIconInner
 
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: Config.bar.tray.background ? Appearance.padding.small : -Appearance.padding.small
-                text: "expand_less"
+                anchors.horizontalCenter: isTop ? undefined : parent.horizontalCenter
+                anchors.verticalCenter: isTop ? parent.verticalCenter : undefined
+                anchors.bottom: isTop ? undefined : parent.bottom
+                anchors.right: isTop ? parent.right : undefined
+                anchors.bottomMargin: isTop ? 0 : (Config.bar.tray.background ? Appearance.padding.small : -Appearance.padding.small)
+                anchors.rightMargin: isTop ? (Config.bar.tray.background ? Appearance.padding.small : -Appearance.padding.small) : 0
+                text: isTop ? "expand_more" : "expand_less"
                 font.pointSize: Appearance.font.size.large
                 rotation: root.expanded ? 180 : 0
 
                 Behavior on rotation {
-                    Anim {}
-                }
-
-                Behavior on anchors.bottomMargin {
                     Anim {}
                 }
             }
@@ -113,6 +128,13 @@ StyledRect {
     }
 
     Behavior on implicitHeight {
+        Anim {
+            duration: Appearance.anim.durations.expressiveDefaultSpatial
+            easing.bezierCurve: Appearance.anim.curves.expressiveDefaultSpatial
+        }
+    }
+
+    Behavior on implicitWidth {
         Anim {
             duration: Appearance.anim.durations.expressiveDefaultSpatial
             easing.bezierCurve: Appearance.anim.curves.expressiveDefaultSpatial
