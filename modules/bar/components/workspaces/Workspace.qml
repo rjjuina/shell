@@ -33,7 +33,8 @@ GridLayout {
     Layout.preferredHeight: isTop ? -1 : size
     Layout.preferredWidth: isTop ? size : -1
 
-    spacing: 0
+    columnSpacing: 0
+    rowSpacing: 0
 
     StyledText {
         id: indicator
