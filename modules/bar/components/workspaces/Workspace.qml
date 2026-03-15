@@ -76,9 +76,9 @@ GridLayout {
         active: root.hasWindows
 
         sourceComponent: Grid {
-            columns: isTop ? -1 : 1
-            rows: isTop ? 1 : -1
-            flow: isTop ? Grid.LeftToRight : Grid.TopToBottom
+            columns: root.isTop ? -1 : 1
+            rows: root.isTop ? 1 : -1
+            flow: root.isTop ? Grid.LeftToRight : Grid.TopToBottom
             spacing: 0
 
             add: Transition {

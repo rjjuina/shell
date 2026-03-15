@@ -102,7 +102,7 @@ Item {
 
         shouldBeActive: root.hasCurrent && !root.detachedMode
         anchors.right: Config.bar.position === "top" ? undefined : parent.right
-        anchors.bottom: Config.bar.position === "top" ? parent.bottom : undefined
+        anchors.top: Config.bar.position === "top" ? parent.top : undefined
         anchors.verticalCenter: Config.bar.position === "top" ? undefined : parent.verticalCenter
         anchors.horizontalCenter: Config.bar.position === "top" ? parent.horizontalCenter : undefined
 
