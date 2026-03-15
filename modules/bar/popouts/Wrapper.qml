@@ -101,8 +101,10 @@ Item {
         id: content
 
         shouldBeActive: root.hasCurrent && !root.detachedMode
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: Config.bar.position === "top" ? undefined : parent.right
+        anchors.bottom: Config.bar.position === "top" ? parent.bottom : undefined
+        anchors.verticalCenter: Config.bar.position === "top" ? undefined : parent.verticalCenter
+        anchors.horizontalCenter: Config.bar.position === "top" ? parent.horizontalCenter : undefined
 
         sourceComponent: Content {
             wrapper: root

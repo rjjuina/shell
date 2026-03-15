@@ -92,10 +92,23 @@ Item {
 
         screen: root.screen
 
-        x: isDetached ? (root.width - nonAnimWidth) / 2 : 0
+        x: {
+            if (isDetached)
+                return (root.width - nonAnimWidth) / 2;
+            if (Config.bar.position === "top") {
+                const off = currentCenter - nonAnimWidth / 2;
+                const diff = root.width - Math.floor(off + nonAnimWidth);
+                if (diff < 0)
+                    return off + diff;
+                return Math.max(off, 0);
+            }
+            return 0;
+        }
         y: {
             if (isDetached)
                 return (root.height - nonAnimHeight) / 2;
+            if (Config.bar.position === "top")
+                return 0;
 
             const off = currentCenter - Config.border.thickness - nonAnimHeight / 2;
             const diff = root.height - Math.floor(off + nonAnimHeight);
