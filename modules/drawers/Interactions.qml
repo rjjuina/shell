@@ -25,7 +25,7 @@ CustomMouseArea {
     }
 
     function withinPanelWidth(panel: Item, x: real, y: real): bool {
-        const panelX = (isTop ? 0 : bar.implicitWidth) + panel.x;
+        const panelX = (isTop ? Config.border.thickness : bar.implicitWidth) + panel.x;
         return x >= panelX - Config.border.rounding && x <= panelX + panel.width + Config.border.rounding;
     }
 
@@ -38,7 +38,8 @@ CustomMouseArea {
     }
 
     function inTopPanel(panel: Item, x: real, y: real): bool {
-        return y < Config.border.thickness + panel.y + panel.height && withinPanelWidth(panel, x, y);
+        const baseY = isTop ? bar.implicitHeight : Config.border.thickness;
+        return y < baseY + panel.y + panel.height && withinPanelWidth(panel, x, y);
     }
 
     function inBottomPanel(panel: Item, x: real, y: real): bool {

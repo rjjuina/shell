@@ -96,7 +96,7 @@ Item {
             if (isDetached)
                 return (root.width - nonAnimWidth) / 2;
             if (Config.bar.position === "top") {
-                const off = currentCenter - nonAnimWidth / 2;
+                const off = currentCenter - Config.border.thickness - nonAnimWidth / 2;
                 const diff = root.width - Math.floor(off + nonAnimWidth);
                 if (diff < 0)
                     return off + diff;

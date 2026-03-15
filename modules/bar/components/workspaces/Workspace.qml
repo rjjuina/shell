@@ -25,7 +25,7 @@ GridLayout {
     readonly property bool isOccupied: occupied[ws] ?? false
     readonly property bool hasWindows: isOccupied && Config.bar.workspaces.showWindows
 
-    columns: isTop ? 1 : 1
+    columns: isTop ? -1 : 1
     rows: isTop ? 1 : -1
     flow: isTop ? GridLayout.LeftToRight : GridLayout.TopToBottom
 
