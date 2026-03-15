@@ -15,8 +15,9 @@ Item {
 
     required property ShellScreen screen
 
-    readonly property real nonAnimWidth: x > 0 || hasCurrent ? children.find(c => c.shouldBeActive)?.implicitWidth ?? content.implicitWidth : 0
-    readonly property real nonAnimHeight: children.find(c => c.shouldBeActive)?.implicitHeight ?? content.implicitHeight
+    readonly property bool isTop: Config.bar.position === "top"
+    readonly property real nonAnimWidth: isTop ? (children.find(c => c.shouldBeActive)?.implicitWidth ?? content.implicitWidth) : (x > 0 || hasCurrent ? children.find(c => c.shouldBeActive)?.implicitWidth ?? content.implicitWidth : 0)
+    readonly property real nonAnimHeight: isTop ? (y > 0 || hasCurrent ? children.find(c => c.shouldBeActive)?.implicitHeight ?? content.implicitHeight : 0) : (children.find(c => c.shouldBeActive)?.implicitHeight ?? content.implicitHeight)
     readonly property Item current: content.item?.current ?? null
 
     property string currentName
@@ -49,7 +50,7 @@ Item {
         animCurve = Appearance.anim.curves.emphasized;
     }
 
-    visible: width > 0 && height > 0
+    visible: (isTop || width > 0) && height > 0
     clip: true
 
     implicitWidth: nonAnimWidth
@@ -143,7 +144,7 @@ Item {
     }
 
     Behavior on y {
-        enabled: root.implicitWidth > 0
+        enabled: root.isTop ? root.implicitHeight > 0 : root.implicitWidth > 0
 
         Anim {
             duration: root.animLength
@@ -152,6 +153,8 @@ Item {
     }
 
     Behavior on implicitWidth {
+        enabled: !root.isTop
+
         Anim {
             duration: root.animLength
             easing.bezierCurve: root.animCurve
@@ -159,7 +162,7 @@ Item {
     }
 
     Behavior on implicitHeight {
-        enabled: root.implicitWidth > 0
+        enabled: root.isTop || root.implicitWidth > 0
 
         Anim {
             duration: root.animLength
