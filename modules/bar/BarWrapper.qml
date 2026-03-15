@@ -86,6 +86,8 @@ Item {
         active: root.shouldBeVisible || root.visible
 
         sourceComponent: Bar {
+            width: content.width
+            height: content.height
             screen: root.screen
             visibilities: root.visibilities
             popouts: root.popouts
