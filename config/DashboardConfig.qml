@@ -1,7 +1,7 @@
 import Quickshell.Io
 
 JsonObject {
-    property bool enabled: false
+    property bool enabled: true
     property bool showOnHover: true
     property int mediaUpdateInterval: 500
     property int resourceUpdateInterval: 1000
