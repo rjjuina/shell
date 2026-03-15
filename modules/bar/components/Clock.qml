@@ -14,12 +14,11 @@ Grid {
     columns: isTop ? -1 : 1
     rows: isTop ? 1 : -1
     flow: isTop ? Grid.LeftToRight : Grid.TopToBottom
+    horizontalItemAlignment: Grid.AlignHCenter
+    verticalItemAlignment: Grid.AlignVCenter
     spacing: Appearance.spacing.small
 
     Loader {
-        anchors.horizontalCenter: isTop ? undefined : parent.horizontalCenter
-        anchors.verticalCenter: isTop ? parent.verticalCenter : undefined
-
         active: Config.bar.clock.showIcon
         visible: active
 
@@ -31,9 +30,6 @@ Grid {
 
     StyledText {
         id: text
-
-        anchors.horizontalCenter: isTop ? undefined : parent.horizontalCenter
-        anchors.verticalCenter: isTop ? parent.verticalCenter : undefined
 
         horizontalAlignment: StyledText.AlignHCenter
         text: {

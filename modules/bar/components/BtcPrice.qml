@@ -16,18 +16,16 @@ Grid {
     columns: isTop ? -1 : 1
     rows: isTop ? 1 : -1
     flow: isTop ? Grid.LeftToRight : Grid.TopToBottom
+    horizontalItemAlignment: Grid.AlignHCenter
+    verticalItemAlignment: Grid.AlignVCenter
     spacing: Appearance.spacing.small
 
     MaterialIcon {
-        anchors.horizontalCenter: isTop ? undefined : parent.horizontalCenter
-        anchors.verticalCenter: isTop ? parent.verticalCenter : undefined
         text: "currency_bitcoin"
         color: root.colour
     }
 
     StyledText {
-        anchors.horizontalCenter: isTop ? undefined : parent.horizontalCenter
-        anchors.verticalCenter: isTop ? parent.verticalCenter : undefined
         horizontalAlignment: StyledText.AlignHCenter
         text: root.price
         font.pointSize: Appearance.font.size.smaller
