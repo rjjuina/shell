@@ -11,14 +11,21 @@ Scope {
     required property ShellScreen screen
     required property Item bar
 
+    // Bar exclusive zone
     ExclusionZone {
         anchors.left: Config.bar.position !== "top"
         anchors.top: Config.bar.position === "top"
         exclusiveZone: root.bar.exclusiveZone
     }
 
+    // Border: top (only when bar is NOT on top, otherwise bar handles it)
     ExclusionZone {
-        anchors.top: true
+        anchors.top: Config.bar.position !== "top"
+    }
+
+    // Border: left (only when bar is on top, otherwise bar handles it)
+    ExclusionZone {
+        anchors.left: Config.bar.position === "top"
     }
 
     ExclusionZone {

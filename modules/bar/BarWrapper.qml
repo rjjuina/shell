@@ -81,16 +81,11 @@ Item {
     Loader {
         id: content
 
-        anchors.top: parent.top
-        anchors.bottom: isTop ? parent.bottom : parent.bottom
-        anchors.left: isTop ? parent.left : undefined
-        anchors.right: isTop ? parent.right : parent.right
+        anchors.fill: parent
 
         active: root.shouldBeVisible || root.visible
 
         sourceComponent: Bar {
-            width: isTop ? parent.width : root.contentWidth
-            height: isTop ? root.contentHeight : undefined
             screen: root.screen
             visibilities: root.visibilities
             popouts: root.popouts
